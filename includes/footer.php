@@ -7,10 +7,12 @@
         </div>
     </div>
     
-    <script src="/assets/js/jquery-3.6.0.min.js"></script>
-    <script src="/assets/js/bootstrap.bundle.min.js"></script>
-    <script src="/assets/js/main.js"></script>
+    <script src="<?php echo BASE_URL; ?>/assets/js/jquery-3.6.0.min.js"></script>
+    <script src="<?php echo BASE_URL; ?>/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="<?php echo BASE_URL; ?>/assets/js/main.js"></script>
     <script>
+        const BASE_URL = '<?php echo BASE_URL; ?>';
+        
         // Theme toggle
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = document.getElementById('themeIcon');
@@ -38,7 +40,7 @@
         
         // Notification polling
         function loadNotifications() {
-            fetch('/ajax/notification_count.php')
+            fetch(BASE_URL + '/ajax/notification_count.php')
                 .then(response => response.json())
                 .then(data => {
                     const badge = document.getElementById('notificationCount');
@@ -53,14 +55,14 @@
         }
         
         function loadNotificationList() {
-            fetch('/pages/notifications/get_notifications.php?limit=15')
+            fetch(BASE_URL + '/pages/notifications/get_notifications.php?limit=15')
                 .then(response => response.json())
                 .then(data => {
                     const list = document.getElementById('notificationList');
                     
                     if (data.notifications && data.notifications.length > 0) {
                         list.innerHTML = data.notifications.map(notif => `
-                            <a href="/pages/notifications/list_notifications.php?id=${notif.id}" 
+                            <a href="${BASE_URL}/pages/notifications/list_notifications.php?id=${notif.id}" 
                                class="list-group-item list-group-item-action ${notif.is_read ? '' : 'fw-bold'}">
                                 <div class="d-flex w-100 justify-content-between">
                                     <h6 class="mb-1">${notif.title}</h6>
@@ -90,7 +92,7 @@
             event.preventDefault();
             event.stopPropagation();
             
-            fetch('/pages/notifications/acknowledge_notification.php', {
+            fetch(BASE_URL + '/pages/notifications/acknowledge_notification.php', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'},
                 body: `id=${id}`

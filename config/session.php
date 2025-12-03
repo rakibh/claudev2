@@ -39,7 +39,7 @@ function is_admin() {
 // Redirect to login if not authenticated
 function require_login() {
     if (!is_logged_in()) {
-        header('Location: /login.php');
+        header('Location: ' . BASE_URL . '/login.php');
         exit;
     }
 }
@@ -48,7 +48,7 @@ function require_login() {
 function require_admin() {
     require_login();
     if (!is_admin()) {
-        header('Location: /pages/dashboard_user.php');
+        header('Location: ' . BASE_URL . '/pages/dashboard_user.php');
         exit;
     }
 }

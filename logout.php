@@ -3,6 +3,7 @@
 // Purpose: Logout functionality with session destruction and cache clearing
 
 require_once 'config/database.php';
+require_once 'config/constants.php';
 require_once 'config/session.php';
 require_once 'includes/functions.php';
 
@@ -23,6 +24,6 @@ header("Pragma: no-cache");
 header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
 
 // Redirect to login
-header('Location: login.php');
+header('Location: ' . BASE_URL . '/login.php');
 exit;
 ?>

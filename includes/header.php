@@ -8,7 +8,7 @@ if (!defined('PAGE_TITLE')) {
 }
 
 $current_user_name = $_SESSION['first_name'] . ' ' . $_SESSION['last_name'];
-$current_user_photo = $_SESSION['profile_photo'] ? '/uploads/profiles/' . $_SESSION['profile_photo'] : '/assets/images/default-avatar.png';
+$current_user_photo = $_SESSION['profile_photo'] ? BASE_URL . '/uploads/profiles/' . $_SESSION['profile_photo'] : BASE_URL . '/assets/images/default-avatar.png';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,13 +16,13 @@ $current_user_photo = $_SESSION['profile_photo'] ? '/uploads/profiles/' . $_SESS
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo PAGE_TITLE; ?> - <?php echo SYSTEM_NAME; ?></title>
-    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/assets/css/bootstrap-icons.css">
-    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/bootstrap-icons.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/style.css">
 </head>
 <body>
     <header class="navbar navbar-dark bg-dark sticky-top flex-md-nowrap p-0 shadow">
-        <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="/">
+        <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="<?php echo BASE_URL; ?>">
             <?php echo SYSTEM_NAME; ?>
         </a>
         
@@ -44,7 +44,7 @@ $current_user_photo = $_SESSION['profile_photo'] ? '/uploads/profiles/' . $_SESS
                         <div class="text-center p-3 text-muted">Loading...</div>
                     </div>
                     <div class="dropdown-footer text-center border-top p-2">
-                        <a href="/pages/notifications/list_notifications.php" class="small">View All</a>
+                        <a href="<?php echo BASE_URL; ?>/pages/notifications/list_notifications.php" class="small">View All</a>
                     </div>
                 </div>
             </div>
@@ -65,11 +65,11 @@ $current_user_photo = $_SESSION['profile_photo'] ? '/uploads/profiles/' . $_SESS
                     <span class="ms-2 d-none d-md-inline"><?php echo htmlspecialchars($current_user_name); ?></span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                    <li><a class="dropdown-item" href="/pages/users/profile.php">
+                    <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/pages/users/profile.php">
                         <i class="bi bi-person me-2"></i>My Profile
                     </a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="/logout.php">
+                    <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/logout.php">
                         <i class="bi bi-box-arrow-right me-2"></i>Logout
                     </a></li>
                 </ul>
@@ -79,7 +79,7 @@ $current_user_photo = $_SESSION['profile_photo'] ? '/uploads/profiles/' . $_SESS
     
     <div class="container-fluid">
         <div class="row">
-            <?php include 'sidebar.php'; ?>
+            <?php include BASE_PATH . '/includes/sidebar.php'; ?>
             
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
                 <?php if (isset($_SESSION['success_message'])): ?>

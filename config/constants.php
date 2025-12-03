@@ -3,7 +3,7 @@
 // File: constants.php
 // Purpose: Global constants and configuration settings
 
-// Base paths
+// Base paths - IMPORTANT: Update BASE_URL to match your environment
 define('BASE_PATH', dirname(__DIR__));
 define('BASE_URL', 'http://localhost/claudev2');
 

@@ -3,22 +3,23 @@
 // Purpose: User login page with security features and validation
 
 require_once 'config/database.php';
-require_once 'config/session.php';
 require_once 'config/constants.php';
+require_once 'config/session.php';
 require_once 'includes/functions.php';
 
 // Redirect if already logged in
 if (is_logged_in()) {
     if (is_admin()) {
-        header('Location: pages/dashboard_admin.php');
+        header('Location: ' . BASE_URL . '/pages/dashboard_admin.php');
     } else {
-        header('Location: pages/dashboard_user.php');
+        header('Location: ' . BASE_URL . '/pages/dashboard_user.php');
     }
     exit;
 }
 
 $error = '';
 $error_code = '';
+$login_id = '';
 
 // Process login
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -91,9 +92,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         
                         // Redirect based on role
                         if ($user['role'] === 'Admin') {
-                            header('Location: pages/dashboard_admin.php');
+                            header('Location: ' . BASE_URL . '/pages/dashboard_admin.php');
                         } else {
-                            header('Location: pages/dashboard_user.php');
+                            header('Location: ' . BASE_URL . '/pages/dashboard_user.php');
                         }
                         exit;
                     }
@@ -123,9 +124,9 @@ $csrf_token = generate_csrf_token();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - <?php echo SYSTEM_NAME; ?></title>
-    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="assets/css/bootstrap-icons.css">
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/bootstrap-icons.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/style.css">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -204,18 +205,20 @@ $csrf_token = generate_csrf_token();
                 </div>
             <?php endif; ?>
             
-            <form id="loginForm" method="POST" action="">
+            <form id="loginForm" method="POST" action="<?php echo BASE_URL; ?>/login.php">
                 <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
                 
                 <div class="mb-3">
                     <label for="login_id" class="form-label">Employee ID / Username</label>
-                    <input type="text" class="form-control rounded" id="login_id" name="login_id" placeholder="E-101 or rakib" value="<?php echo htmlspecialchars($login_id ?? ''); ?>" required>
+                    <input type="text" class="form-control" id="login_id" name="login_id" 
+                           placeholder="E-101 or rakib" value="<?php echo htmlspecialchars($login_id); ?>" required>
                 </div>
                 
                 <div class="mb-3">
                     <label for="password" class="form-label">Password</label>
                     <div class="input-group">
-                        <input type="password" class="form-control rounded" id="password" name="password" placeholder="•••••••" required minlength="6">
+                        <input type="password" class="form-control" id="password" name="password" 
+                               placeholder="•••••••" required minlength="6">
                         <span class="password-toggle" onclick="togglePassword()">
                             <i class="bi bi-eye" id="toggleIcon"></i>
                         </span>
@@ -230,7 +233,7 @@ $csrf_token = generate_csrf_token();
         </div>
     </div>
     
-    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="<?php echo BASE_URL; ?>/assets/js/bootstrap.bundle.min.js"></script>
     <script>
         // Enable/disable login button based on input
         const loginIdInput = document.getElementById('login_id');

@@ -4,8 +4,8 @@
 // Purpose: Admin dashboard with system statistics and quick links
 
 require_once '../config/database.php';
-require_once '../config/session.php';
 require_once '../config/constants.php';
+require_once '../config/session.php';
 require_once '../includes/functions.php';
 
 require_admin();
@@ -72,7 +72,7 @@ include '../includes/header.php';
                         <i class="bi bi-people fs-1"></i>
                     </div>
                 </div>
-                <a href="/pages/users/list_users.php" class="btn btn-sm btn-outline-primary mt-2 w-100">View All</a>
+                <a href="<?php echo BASE_URL; ?>/pages/users/list_users.php" class="btn btn-sm btn-outline-primary mt-2 w-100">View All</a>
             </div>
         </div>
     </div>
@@ -89,7 +89,7 @@ include '../includes/header.php';
                         <i class="bi bi-pc-display fs-1"></i>
                     </div>
                 </div>
-                <a href="/pages/equipment/list_equipment.php" class="btn btn-sm btn-outline-success mt-2 w-100">View All</a>
+                <a href="<?php echo BASE_URL; ?>/pages/equipment/list_equipment.php" class="btn btn-sm btn-outline-success mt-2 w-100">View All</a>
             </div>
         </div>
     </div>
@@ -106,7 +106,7 @@ include '../includes/header.php';
                         <i class="bi bi-check2-square fs-1"></i>
                     </div>
                 </div>
-                <a href="/pages/tasks/list_tasks.php" class="btn btn-sm btn-outline-warning mt-2 w-100">View All</a>
+                <a href="<?php echo BASE_URL; ?>/pages/tasks/list_tasks.php" class="btn btn-sm btn-outline-warning mt-2 w-100">View All</a>
             </div>
         </div>
     </div>
@@ -123,7 +123,7 @@ include '../includes/header.php';
                         <i class="bi bi-hdd-network fs-1"></i>
                     </div>
                 </div>
-                <a href="/pages/network/list_network_info.php" class="btn btn-sm btn-outline-info mt-2 w-100">View All</a>
+                <a href="<?php echo BASE_URL; ?>/pages/network/list_network_info.php" class="btn btn-sm btn-outline-info mt-2 w-100">View All</a>
             </div>
         </div>
     </div>
@@ -134,7 +134,7 @@ include '../includes/header.php';
 <div class="alert alert-danger" role="alert">
     <i class="bi bi-exclamation-triangle-fill me-2"></i>
     <strong>Warning:</strong> You have <?php echo $stats['overdue_tasks']; ?> overdue tasks.
-    <a href="/pages/tasks/list_tasks.php?filter=overdue" class="alert-link">View overdue tasks</a>
+    <a href="<?php echo BASE_URL; ?>/pages/tasks/list_tasks.php?filter=overdue" class="alert-link">View overdue tasks</a>
 </div>
 <?php endif; ?>
 
@@ -142,7 +142,7 @@ include '../includes/header.php';
 <div class="alert alert-warning" role="alert">
     <i class="bi bi-exclamation-circle-fill me-2"></i>
     <strong>Notice:</strong> <?php echo $stats['expiring_warranties']; ?> equipment warranties expiring in 30 days.
-    <a href="/pages/equipment/list_equipment.php?filter=warranty_expiring" class="alert-link">View equipment</a>
+    <a href="<?php echo BASE_URL; ?>/pages/equipment/list_equipment.php?filter=warranty_expiring" class="alert-link">View equipment</a>
 </div>
 <?php endif; ?>
 
@@ -182,7 +182,7 @@ include '../includes/header.php';
         </div>
     </div>
     <div class="card-footer bg-white text-center">
-        <a href="/pages/tools/system_logs.php" class="btn btn-sm btn-outline-secondary">View All Logs</a>
+        <a href="<?php echo BASE_URL; ?>/pages/tools/system_logs.php" class="btn btn-sm btn-outline-secondary">View All Logs</a>
     </div>
 </div>
 

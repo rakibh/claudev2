@@ -8,7 +8,7 @@
         <ul class="nav flex-column">
             <li class="nav-item">
                 <a class="nav-link <?php echo (strpos($_SERVER['PHP_SELF'], 'dashboard') !== false) ? 'active' : ''; ?>" 
-                   href="/pages/<?php echo is_admin() ? 'dashboard_admin' : 'dashboard_user'; ?>.php">
+                   href="<?php echo BASE_URL; ?>/pages/<?php echo is_admin() ? 'dashboard_admin' : 'dashboard_user'; ?>.php">
                     <i class="bi bi-speedometer2 me-2"></i>
                     Dashboard
                 </a>
@@ -17,7 +17,7 @@
             <?php if (is_admin()): ?>
             <li class="nav-item">
                 <a class="nav-link <?php echo (strpos($_SERVER['PHP_SELF'], 'users') !== false && strpos($_SERVER['PHP_SELF'], 'profile') === false) ? 'active' : ''; ?>" 
-                   href="/pages/users/list_users.php">
+                   href="<?php echo BASE_URL; ?>/pages/users/list_users.php">
                     <i class="bi bi-people me-2"></i>
                     Users
                 </a>
@@ -26,7 +26,7 @@
             
             <li class="nav-item">
                 <a class="nav-link <?php echo (strpos($_SERVER['PHP_SELF'], 'tasks') !== false) ? 'active' : ''; ?>" 
-                   href="/pages/tasks/list_tasks.php">
+                   href="<?php echo BASE_URL; ?>/pages/tasks/list_tasks.php">
                     <i class="bi bi-check2-square me-2"></i>
                     Tasks
                 </a>
@@ -34,7 +34,7 @@
             
             <li class="nav-item">
                 <a class="nav-link <?php echo (strpos($_SERVER['PHP_SELF'], 'equipment') !== false) ? 'active' : ''; ?>" 
-                   href="/pages/equipment/list_equipment.php">
+                   href="<?php echo BASE_URL; ?>/pages/equipment/list_equipment.php">
                     <i class="bi bi-pc-display me-2"></i>
                     Equipment
                 </a>
@@ -42,7 +42,7 @@
             
             <li class="nav-item">
                 <a class="nav-link <?php echo (strpos($_SERVER['PHP_SELF'], 'network') !== false) ? 'active' : ''; ?>" 
-                   href="/pages/network/list_network_info.php">
+                   href="<?php echo BASE_URL; ?>/pages/network/list_network_info.php">
                     <i class="bi bi-hdd-network me-2"></i>
                     Network
                 </a>
@@ -50,7 +50,7 @@
             
             <li class="nav-item">
                 <a class="nav-link <?php echo (strpos($_SERVER['PHP_SELF'], 'notifications') !== false) ? 'active' : ''; ?>" 
-                   href="/pages/notifications/list_notifications.php">
+                   href="<?php echo BASE_URL; ?>/pages/notifications/list_notifications.php">
                     <i class="bi bi-bell me-2"></i>
                     Notifications
                 </a>
@@ -64,7 +64,7 @@
             <?php if (is_admin()): ?>
             <li class="nav-item">
                 <a class="nav-link <?php echo (strpos($_SERVER['PHP_SELF'], 'tools') !== false) ? 'active' : ''; ?>" 
-                   href="/pages/tools/system_settings.php">
+                   href="<?php echo BASE_URL; ?>/pages/tools/system_settings.php">
                     <i class="bi bi-gear me-2"></i>
                     Settings & Tools
                 </a>
@@ -72,7 +72,7 @@
             <?php endif; ?>
             
             <li class="nav-item">
-                <a class="nav-link" href="/logout.php">
+                <a class="nav-link" href="<?php echo BASE_URL; ?>/logout.php">
                     <i class="bi bi-box-arrow-right me-2"></i>
                     Logout
                 </a>
