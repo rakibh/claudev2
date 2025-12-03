@@ -1,0 +1,105 @@
+asset_registry_db_project/
+│
+├── index.php
+├── login.php
+├── logout.php
+│
+├── config/
+│   ├── database.php
+│   ├── session.php
+│   └── constants.php
+│
+├── includes/
+│   ├── header.php
+│   ├── sidebar.php
+│   ├── footer.php
+│   └── functions.php
+│
+├── pages/
+│   ├── dashboard_admin.php
+│   ├── dashboard_user.php
+│   │
+│   ├── users/
+│   │   ├── list_users.php
+│   │   ├── add_user.php
+│   │   ├── edit_user.php
+│   │   ├── view_user.php
+│   │   ├── delete_user.php
+│   │   ├── reset_password.php
+│   │   └── profile.php
+│   │
+│   ├── equipment/
+│   │   ├── list_equipment.php
+│   │   ├── add_equipment.php
+│   │   ├── edit_equipment.php
+│   │   ├── view_equipment.php
+│   │   ├── delete_equipment.php
+│   │   └── get_equipment_fields.php
+│   │
+│   ├── network/
+│   │   ├── list_network_info.php
+│   │   ├── add_network_info.php
+│   │   ├── edit_network_info.php
+│   │   ├── view_network_info.php
+│   │   ├── delete_network_info.php
+│   │   ├── assign_network_info.php
+│   │   └── unassign_network_info.php
+│   │
+│   ├── tasks/
+│   │   ├── list_tasks.php
+│   │   ├── add_task.php
+│   │   ├── edit_task.php
+│   │   ├── view_task.php
+│   │   ├── delete_task.php
+│   │   └── update_task_status.php
+│   │
+│   ├── notifications/
+│   │   ├── list_notifications.php
+│   │   ├── get_notifications.php
+│   │   ├── mark_read.php
+│   │   ├── acknowledge_notification.php
+│   │   └── delete_notification.php
+│   │
+│   └── tools/
+│       ├── optimize_database.php
+│       ├── backup_database.php
+│       ├── system_logs.php
+│       ├── system_settings.php
+│       ├── cache_cleanup.php
+│       └── repair_database.php
+│
+├── ajax/
+│   ├── check_session.php
+│   ├── get_equipment_types.php
+│   ├── validate_ip.php
+│   ├── notification_count.php
+│   └── update_notification_status.php
+│
+├── assets/
+│   ├── css/
+│   │   ├── bootstrap.min.css
+│   │   ├── bootstrap-icons.css
+│   │   └── style.css
+│   │
+│   ├── js/
+│   │   ├── bootstrap.bundle.min.js
+│   │   ├── jquery-3.6.0.min.js
+│   │   └── main.js
+│   │
+│   ├── fonts/
+│   │   └── Inter/
+│   │
+│   └── images/
+│       └── logo.png
+│
+├── uploads/
+│   ├── profiles/
+│   ├── warranty/
+│   └── temp/
+│
+├── backups/
+│
+├── cache/
+│
+└── logs/
+    └── system.log
