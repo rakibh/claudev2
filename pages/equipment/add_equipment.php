@@ -1,7 +1,7 @@
 <?php
 // Folder: pages/equipment/
 // File: add_equipment.php
-// Purpose: Add new equipment with dynamic type-specific fields
+// Purpose: Add new equipment with AJAX dynamic type-specific fields
 
 require_once '../../config/database.php';
 require_once '../../config/constants.php';
@@ -125,6 +125,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare($sql);
                 foreach ($_POST['custom_fields'] as $field_name => $field_value) {
                     if (!empty($field_value)) {
+                        // Handle array values (for multi-select)
+                        if (is_array($field_value)) {
+                            $field_value = implode(', ', $field_value);
+                        }
                         $stmt->execute([$equipment_id, $field_name, sanitize_input($field_value)]);
                     }
                 }
@@ -183,7 +187,7 @@ include '../../includes/header.php';
 </div>
 <?php endif; ?>
 
-<form method="POST" enctype="multipart/form-data">
+<form method="POST" enctype="multipart/form-data" id="equipmentForm">
     <!-- Identification Block -->
     <div class="card mb-4">
         <div class="card-header bg-white">
@@ -226,6 +230,31 @@ include '../../includes/header.php';
                     <input type="text" class="form-control" id="serial_number" name="serial_number" 
                            value="<?php echo htmlspecialchars($_POST['serial_number'] ?? ''); ?>">
                     <small class="text-muted">Must be unique (except "N/A")</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Type-Specific Fields Container (Dynamically Loaded) -->
+    <div id="typeSpecificFieldsContainer"></div>
+    
+    <!-- Network Connection Toggle (Dynamically Shown) -->
+    <div id="networkToggleContainer" style="display: none;">
+        <div class="card mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-hdd-network me-2"></i>Network Connection</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="has_network_connection" name="has_network_connection">
+                    <label class="form-check-label" for="has_network_connection">
+                        Does this device have a network connection?
+                    </label>
+                </div>
+                <div id="networkFields" style="display: none; margin-top: 1rem;">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>Network information can be added after creating the equipment from the Network Management section.
+                    </div>
                 </div>
             </div>
         </div>
@@ -385,5 +414,107 @@ include '../../includes/header.php';
         </button>
     </div>
 </form>
+
+<script>
+// AJAX Dynamic Field Loading
+document.getElementById('type_id').addEventListener('change', function() {
+    const typeId = this.value;
+    const container = document.getElementById('typeSpecificFieldsContainer');
+    const networkToggle = document.getElementById('networkToggleContainer');
+    
+    if (!typeId) {
+        container.innerHTML = '';
+        networkToggle.style.display = 'none';
+        return;
+    }
+    
+    // Show loading
+    container.innerHTML = '<div class="card mb-4"><div class="card-body text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-3 mb-0 text-muted">Loading type-specific fields...</p></div></div>';
+    
+    // Fetch type-specific fields
+    fetch(`get_equipment_fields.php?type_id=${typeId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Generate HTML for type-specific fields
+                let html = '';
+                
+                if (data.fields && data.fields.length > 0) {
+                    html += '<div class="card mb-4">';
+                    html += '<div class="card-header bg-white">';
+                    html += '<h5 class="mb-0"><i class="bi bi-cpu me-2"></i>' + escapeHtml(data.type_name) + ' Specifications</h5>';
+                    html += '</div>';
+                    html += '<div class="card-body">';
+                    html += '<div class="row g-3">';
+                    
+                    data.fields.forEach(field => {
+                        html += '<div class="col-md-6">';
+                        html += '<label for="cf_' + field.name + '" class="form-label">' + escapeHtml(field.label) + '</label>';
+                        
+                        if (field.type === 'textarea') {
+                            html += '<textarea class="form-control" id="cf_' + field.name + '" name="custom_fields[' + field.name + ']" rows="3"';
+                            if (field.placeholder) html += ' placeholder="' + escapeHtml(field.placeholder) + '"';
+                            html += '></textarea>';
+                        } else if (field.type === 'select') {
+                            html += '<select class="form-select" id="cf_' + field.name + '" name="custom_fields[' + field.name + ']">';
+                            html += '<option value="">Select ' + escapeHtml(field.label) + '</option>';
+                            field.options.forEach(opt => {
+                                html += '<option value="' + escapeHtml(opt) + '">' + escapeHtml(opt) + '</option>';
+                            });
+                            html += '</select>';
+                        } else if (field.type === 'select-multiple') {
+                            html += '<select class="form-select" id="cf_' + field.name + '" name="custom_fields[' + field.name + '][]" multiple size="4">';
+                            field.options.forEach(opt => {
+                                html += '<option value="' + escapeHtml(opt) + '">' + escapeHtml(opt) + '</option>';
+                            });
+                            html += '</select>';
+                            html += '<small class="text-muted">Hold Ctrl/Cmd to select multiple</small>';
+                        } else {
+                            html += '<input type="text" class="form-control" id="cf_' + field.name + '" name="custom_fields[' + field.name + ']"';
+                            if (field.placeholder) html += ' placeholder="' + escapeHtml(field.placeholder) + '"';
+                            html += '>';
+                        }
+                        
+                        html += '</div>';
+                    });
+                    
+                    html += '</div></div></div>';
+                }
+                
+                container.innerHTML = html;
+                
+                // Show/hide network toggle based on equipment type
+                if (data.has_network) {
+                    networkToggle.style.display = 'block';
+                } else {
+                    networkToggle.style.display = 'none';
+                }
+            } else {
+                container.innerHTML = '<div class="alert alert-warning"><i class="bi bi-exclamation-triangle me-2"></i>' + escapeHtml(data.message || 'Failed to load type-specific fields') + '</div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            container.innerHTML = '<div class="alert alert-danger"><i class="bi bi-x-circle me-2"></i>An error occurred while loading fields. Please try again.</div>';
+        });
+});
+
+// Network connection toggle
+document.getElementById('has_network_connection')?.addEventListener('change', function() {
+    const networkFields = document.getElementById('networkFields');
+    if (this.checked) {
+        networkFields.style.display = 'block';
+    } else {
+        networkFields.style.display = 'none';
+    }
+});
+
+// Helper function to escape HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+</script>
 
 <?php include '../../includes/footer.php'; ?>
