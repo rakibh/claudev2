@@ -1,7 +1,7 @@
 <?php
 // Folder: pages/
 // File: dashboard_admin.php
-// Purpose: Enhanced admin dashboard with charts and improved UI
+// Purpose: Enhanced admin dashboard with working charts
 
 require_once '../config/database.php';
 require_once '../config/constants.php';
@@ -77,6 +77,7 @@ $stmt = $pdo->query("SELECT et.type_name, COUNT(e.id) as count
     FROM equipment_types et 
     LEFT JOIN equipments e ON et.id = e.type_id 
     GROUP BY et.id, et.type_name 
+    HAVING count > 0
     ORDER BY count DESC 
     LIMIT 10");
 $equipment_by_type = $stmt->fetchAll();
@@ -249,7 +250,7 @@ include '../includes/header.php';
                 </h5>
             </div>
             <div class="card-body">
-                <div class="chart-container">
+                <div style="position: relative; height: 300px;">
                     <canvas id="equipmentChart"></canvas>
                 </div>
             </div>
@@ -265,7 +266,7 @@ include '../includes/header.php';
                 </h5>
             </div>
             <div class="card-body">
-                <div class="chart-container">
+                <div style="position: relative; height: 300px;">
                     <canvas id="taskChart"></canvas>
                 </div>
             </div>
@@ -283,7 +284,7 @@ include '../includes/header.php';
                 </h5>
             </div>
             <div class="card-body">
-                <div class="chart-container">
+                <div style="position: relative; height: 300px;">
                     <canvas id="trendChart"></canvas>
                 </div>
             </div>
@@ -352,99 +353,113 @@ include '../includes/header.php';
 </div>
 
 <script>
-// Equipment Distribution Chart
-const equipmentCtx = document.getElementById('equipmentChart').getContext('2d');
-new Chart(equipmentCtx, {
-    type: 'doughnut',
-    data: {
-        labels: <?php echo json_encode(array_column($equipment_by_type, 'type_name')); ?>,
-        datasets: [{
-            data: <?php echo json_encode(array_column($equipment_by_type, 'count')); ?>,
-            backgroundColor: [
-                '#667eea', '#764ba2', '#10b981', '#f59e0b', '#ef4444',
-                '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'
-            ],
-            borderWidth: 0
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'right',
-                labels: {
-                    boxWidth: 12,
-                    padding: 10,
-                    font: { size: 11 }
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if Chart is available
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js is not loaded!');
+        return;
+    }
+
+    // Equipment Distribution Chart
+    const equipmentCtx = document.getElementById('equipmentChart');
+    if (equipmentCtx) {
+        new Chart(equipmentCtx, {
+            type: 'doughnut',
+            data: {
+                labels: <?php echo json_encode(array_column($equipment_by_type, 'type_name')); ?>,
+                datasets: [{
+                    data: <?php echo json_encode(array_column($equipment_by_type, 'count')); ?>,
+                    backgroundColor: [
+                        '#667eea', '#764ba2', '#10b981', '#f59e0b', '#ef4444',
+                        '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 10,
+                            font: { size: 11 }
+                        }
+                    }
                 }
             }
-        }
+        });
     }
-});
 
-// Task Status Chart
-const taskCtx = document.getElementById('taskChart').getContext('2d');
-new Chart(taskCtx, {
-    type: 'bar',
-    data: {
-        labels: ['Pending', 'Started', 'Completed', 'Cancelled'],
-        datasets: [{
-            label: 'Tasks',
-            data: [
-                <?php echo $task_chart_data['Pending']; ?>,
-                <?php echo $task_chart_data['Started']; ?>,
-                <?php echo $task_chart_data['Completed']; ?>,
-                <?php echo $task_chart_data['Cancelled']; ?>
-            ],
-            backgroundColor: ['#f59e0b', '#3b82f6', '#10b981', '#ef4444'],
-            borderRadius: 8,
-            borderWidth: 0
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: { display: false }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: { stepSize: 1 }
+    // Task Status Chart
+    const taskCtx = document.getElementById('taskChart');
+    if (taskCtx) {
+        new Chart(taskCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Pending', 'Started', 'Completed', 'Cancelled'],
+                datasets: [{
+                    label: 'Tasks',
+                    data: [
+                        <?php echo $task_chart_data['Pending']; ?>,
+                        <?php echo $task_chart_data['Started']; ?>,
+                        <?php echo $task_chart_data['Completed']; ?>,
+                        <?php echo $task_chart_data['Cancelled']; ?>
+                    ],
+                    backgroundColor: ['#f59e0b', '#3b82f6', '#10b981', '#ef4444'],
+                    borderRadius: 8,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 }
+                    }
+                }
             }
-        }
+        });
     }
-});
 
-// Monthly Trend Chart
-const trendCtx = document.getElementById('trendChart').getContext('2d');
-new Chart(trendCtx, {
-    type: 'line',
-    data: {
-        labels: <?php echo json_encode(array_column($monthly_completions, 'month')); ?>,
-        datasets: [{
-            label: 'Completed Tasks',
-            data: <?php echo json_encode(array_column($monthly_completions, 'completed')); ?>,
-            borderColor: '#667eea',
-            backgroundColor: 'rgba(102, 126, 234, 0.1)',
-            tension: 0.4,
-            fill: true,
-            borderWidth: 3
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: { display: false }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: { stepSize: 1 }
+    // Monthly Trend Chart
+    const trendCtx = document.getElementById('trendChart');
+    if (trendCtx) {
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: <?php echo json_encode(array_column($monthly_completions, 'month')); ?>,
+                datasets: [{
+                    label: 'Completed Tasks',
+                    data: <?php echo json_encode(array_column($monthly_completions, 'completed')); ?>,
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 }
+                    }
+                }
             }
-        }
+        });
     }
 });
 </script>

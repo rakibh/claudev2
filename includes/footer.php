@@ -1,7 +1,7 @@
 <?php
 // Folder: includes/
 // File: footer.php
-// Purpose: Enhanced footer with improved notification polling and theme management
+// Purpose: Enhanced footer with Chart.js global initialization and improved notification polling
 ?>
             </main>
         </div>
@@ -9,7 +9,10 @@
     
     <script src="<?php echo BASE_URL; ?>/assets/js/jquery-3.6.0.min.js"></script>
     <script src="<?php echo BASE_URL; ?>/assets/js/bootstrap.bundle.min.js"></script>
-    <script src="<?php echo BASE_URL; ?>/assets/js/chart.umd.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
     <script>
         const BASE_URL = '<?php echo BASE_URL; ?>';
         
@@ -27,19 +30,21 @@
             }
             
             // Toggle theme
-            themeToggle.addEventListener('click', function() {
-                document.body.classList.toggle('dark-theme');
-                
-                if (document.body.classList.contains('dark-theme')) {
-                    themeIcon.classList.remove('bi-moon-stars-fill');
-                    themeIcon.classList.add('bi-sun-fill');
-                    localStorage.setItem('theme', 'dark');
-                } else {
-                    themeIcon.classList.remove('bi-sun-fill');
-                    themeIcon.classList.add('bi-moon-stars-fill');
-                    localStorage.setItem('theme', 'light');
-                }
-            });
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function() {
+                    document.body.classList.toggle('dark-theme');
+                    
+                    if (document.body.classList.contains('dark-theme')) {
+                        themeIcon.classList.remove('bi-moon-stars-fill');
+                        themeIcon.classList.add('bi-sun-fill');
+                        localStorage.setItem('theme', 'dark');
+                    } else {
+                        themeIcon.classList.remove('bi-sun-fill');
+                        themeIcon.classList.add('bi-moon-stars-fill');
+                        localStorage.setItem('theme', 'light');
+                    }
+                });
+            }
         })();
         
         // Notification System
@@ -68,13 +73,15 @@
                     const data = await response.json();
                     
                     const badge = document.getElementById('notificationCount');
-                    if (data.count > 0) {
-                        badge.textContent = data.count > 99 ? '99+' : data.count;
-                        badge.style.display = 'inline-block';
-                        this.count = data.count;
-                    } else {
-                        badge.style.display = 'none';
-                        this.count = 0;
+                    if (badge) {
+                        if (data.count > 0) {
+                            badge.textContent = data.count > 99 ? '99+' : data.count;
+                            badge.style.display = 'inline-block';
+                            this.count = data.count;
+                        } else {
+                            badge.style.display = 'none';
+                            this.count = 0;
+                        }
                     }
                 } catch (error) {
                     console.error('Error loading notification count:', error);
@@ -83,6 +90,7 @@
             
             async loadNotificationList() {
                 const list = document.getElementById('notificationList');
+                if (!list) return;
                 
                 try {
                     const response = await fetch(`${BASE_URL}/pages/notifications/get_notifications.php?limit=15`);

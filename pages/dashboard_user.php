@@ -1,7 +1,7 @@
 <?php
 // Folder: pages/
 // File: dashboard_user.php
-// Purpose: Enhanced user dashboard with personal statistics and charts
+// Purpose: Enhanced user dashboard with working charts
 
 require_once '../config/database.php';
 require_once '../config/constants.php';
@@ -189,7 +189,7 @@ include '../includes/header.php';
                 </h5>
             </div>
             <div class="card-body">
-                <div class="chart-container">
+                <div style="position: relative; height: 300px;">
                     <canvas id="myTaskChart"></canvas>
                 </div>
             </div>
@@ -205,7 +205,7 @@ include '../includes/header.php';
                 </h5>
             </div>
             <div class="card-body">
-                <div class="chart-container">
+                <div style="position: relative; height: 300px;">
                     <canvas id="trendChart"></canvas>
                 </div>
             </div>
@@ -330,65 +330,77 @@ include '../includes/header.php';
 </div>
 
 <script>
-// My Task Status Chart
-const myTaskCtx = document.getElementById('myTaskChart').getContext('2d');
-new Chart(myTaskCtx, {
-    type: 'doughnut',
-    data: {
-        labels: ['Pending', 'Started', 'Completed'],
-        datasets: [{
-            data: [
-                <?php echo $stats['my_pending']; ?>,
-                <?php echo $stats['my_started']; ?>,
-                <?php echo $stats['my_completed']; ?>
-            ],
-            backgroundColor: ['#f59e0b', '#3b82f6', '#10b981'],
-            borderWidth: 0
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'bottom',
-                labels: {
-                    padding: 15,
-                    font: { size: 12 }
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if Chart is available
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js is not loaded!');
+        return;
+    }
+
+    // My Task Status Chart
+    const myTaskCtx = document.getElementById('myTaskChart');
+    if (myTaskCtx) {
+        new Chart(myTaskCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Pending', 'Started', 'Completed'],
+                datasets: [{
+                    data: [
+                        <?php echo $stats['my_pending']; ?>,
+                        <?php echo $stats['my_started']; ?>,
+                        <?php echo $stats['my_completed']; ?>
+                    ],
+                    backgroundColor: ['#f59e0b', '#3b82f6', '#10b981'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            font: { size: 12 }
+                        }
+                    }
                 }
             }
-        }
+        });
     }
-});
 
-// Completion Trend Chart
-const trendCtx = document.getElementById('trendChart').getContext('2d');
-new Chart(trendCtx, {
-    type: 'line',
-    data: {
-        labels: <?php echo json_encode(array_column($monthly_completions, 'month')); ?>,
-        datasets: [{
-            label: 'Completed Tasks',
-            data: <?php echo json_encode(array_column($monthly_completions, 'completed')); ?>,
-            borderColor: '#10b981',
-            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-            tension: 0.4,
-            fill: true,
-            borderWidth: 3
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: { display: false }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: { stepSize: 1 }
+    // Completion Trend Chart
+    const trendCtx = document.getElementById('trendChart');
+    if (trendCtx) {
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: <?php echo json_encode(array_column($monthly_completions, 'month')); ?>,
+                datasets: [{
+                    label: 'Completed Tasks',
+                    data: <?php echo json_encode(array_column($monthly_completions, 'completed')); ?>,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 }
+                    }
+                }
             }
-        }
+        });
     }
 });
 </script>
