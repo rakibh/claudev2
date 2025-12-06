@@ -245,15 +245,23 @@ include '../../includes/header.php';
                 <h5 class="mb-0"><i class="bi bi-hdd-network me-2"></i>Network Connection</h5>
             </div>
             <div class="card-body">
-                <div class="form-check form-switch">
+                <div class="form-check form-switch mb-3">
                     <input class="form-check-input" type="checkbox" id="has_network_connection" name="has_network_connection">
                     <label class="form-check-label" for="has_network_connection">
-                        Does this device have a network connection?
+                        <strong>Does this device have a network connection?</strong>
                     </label>
                 </div>
-                <div id="networkFields" style="display: none; margin-top: 1rem;">
+                <div id="networkFields" style="display: none;">
                     <div class="alert alert-info">
-                        <i class="bi bi-info-circle me-2"></i>Network information can be added after creating the equipment from the Network Management section.
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Note:</strong> Network information (IP Address, MAC Address, etc.) can be added after creating the equipment from the <strong>Network Management</strong> section.
+                        <br><br>
+                        After saving this equipment, go to: <strong>Network → Add Network Info</strong> or <strong>Network → Assign Network Info</strong>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>Quick Tip:</strong> If you already have network information added, you can link it to this equipment after creation using the "Assign to Equipment" feature in Network Management.
                     </div>
                 </div>
             </div>
@@ -500,14 +508,19 @@ document.getElementById('type_id').addEventListener('change', function() {
 });
 
 // Network connection toggle
-document.getElementById('has_network_connection')?.addEventListener('change', function() {
-    const networkFields = document.getElementById('networkFields');
-    if (this.checked) {
-        networkFields.style.display = 'block';
-    } else {
-        networkFields.style.display = 'none';
-    }
-});
+const networkCheckbox = document.getElementById('has_network_connection');
+if (networkCheckbox) {
+    networkCheckbox.addEventListener('change', function() {
+        const networkFields = document.getElementById('networkFields');
+        if (networkFields) {
+            if (this.checked) {
+                networkFields.style.display = 'block';
+            } else {
+                networkFields.style.display = 'none';
+            }
+        }
+    });
+}
 
 // Helper function to escape HTML
 function escapeHtml(text) {
