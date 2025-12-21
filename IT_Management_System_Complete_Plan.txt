@@ -1,0 +1,938 @@
+
+IT MANAGEMENT SYSTEM
+Complete Application Plan
+
+═══════════════════════════════════════════════════════════════════
+
+TABLE OF CONTENTS
+
+1. System Overview
+2. Technology Stack
+3. Global Requirements
+4. Module 1: Authentication & User Management
+5. Module 2: Task Management
+6. Module 3: Equipment Management
+7. Module 4: Network Management
+8. Module 5: Notifications
+9. Module 6: Tools & Settings
+10. Database Schema Overview
+11. Implementation Best Practices
+12. Testing Checklist
+13. Performance Optimization
+14. Deployment Notes
+
+═══════════════════════════════════════════════════════════════════
+
+1. SYSTEM OVERVIEW
+
+A comprehensive web-based IT management system for tracking equipment, network infrastructure, user management, and task assignment in an office environment.
+
+Core Features:
+• Multi-user role-based access (Admin/Standard User)
+• Equipment and network inventory management
+• Task assignment and tracking system
+• Real-time notification system
+• Administrative tools for system maintenance
+
+═══════════════════════════════════════════════════════════════════
+
+2. TECHNOLOGY STACK
+
+Frontend:
+• HTML5
+• CSS3 with Bootstrap 5
+• JavaScript (AJAX for dynamic operations)
+• Bootstrap Icons
+• Inter font family
+Host all required files locally and avoid using CDN links whenever possible.
+
+Backend:
+• PHP 8.3.14 (PDO for database connections)
+• Apache 2.4.62.1
+• MySQL 9.1.0
+
+═══════════════════════════════════════════════════════════════════
+
+3. GLOBAL REQUIREMENTS
+
+3.1 Design Standards
+
+Typography & Icons:
+• Body font: Inter
+• Icons: Bootstrap Icons
+
+Responsive Design:
+• Mobile-first approach
+• Fully responsive across all devices
+• Use CSS media queries for breakpoints
+
+Layout Structure:
+• Dashboard with Header, Footer, and Sidebar
+• Header: Dark/black theme with logo, profile menu, dark/light theme toggle, notification bell
+• Sidebar: Navigation links (Dashboard, Tasks, Equipment, Network, Notifications) + bottom section (Settings & Tools, Logout)
+
+Language Support:
+• English and Bengali support for all user inputs
+
+Timezone:
+• All timestamps: GMT+6 (Asia/Dhaka)
+• Date format: dd/mm/yyyy
+• Time format: 12-hour with AM/PM (hh:mm:ss)
+
+3.2 Security Standards
+
+All Modules Must Implement:
+• PDO prepared statements (prevent SQL injection)
+• Password hashing (PHP password_hash())
+• CSRF protection on all POST requests
+• Input validation and sanitization
+• Session management with secure cookies
+• Role-based access control
+
+═══════════════════════════════════════════════════════════════════
+
+4. MODULE 1: AUTHENTICATION & USER MANAGEMENT
+
+4.1 Login System
+
+Access Rules:
+• If user already logged in: redirect to appropriate dashboard
+  - Admins → dashboard_admin.php
+  - Standard Users → dashboard_user.php
+
+Login Page Features:
+
+UI Elements:
+• Company logo/name option
+• Single login field: "Employee ID / Username" 
+  (placeholder: "E-101 or rakib")
+• Password field with show/hide toggle (placeholder: "•••••••")
+• Login button (disabled until both fields filled, shows 
+  "Signing in…" during submission)
+• Bootstrap alert area for error messages
+
+Client-Side Validation:
+• Login ID: required, trimmed, non-empty
+• Password: minimum 6 characters, must contain:
+  - At least 1 letter (A-Z or a-z)
+  - At least 1 number (0-9)
+  - At least 1 special character (!@#$%^&*)
+• No Enter key submission in input fields (only via button click)
+
+Security Features:
+• CSRF token validation
+• Rate limiting: max 5 attempts per IP + login_id within 10 minutes
+• Session ID regeneration after successful login
+• Generic error message: "Invalid credentials" (no information leakage)
+• Session cleared on browser close (must re-login)
+• Session persists if only tab closed
+
+Error Messages:
+• 401: "Invalid credentials."
+• 403: "Your account is inactive. Contact admin."
+• 422: "Password must be 6+ chars incl. a letter, a number, 
+  and a special character."
+• 429: "Too many attempts. Try again later."
+• 500: "Something went wrong. Please try again."
+
+Logout System:
+• Session destruction via session_destroy()
+• Clear browser cache (prevent back button access)
+• Redirect to login page
+
+4.2 User Management
+
+User Roles:
+• Admin: Full system access, user management, all CRUD operations
+• Standard User: View own profile, edit own information 
+  (except Role, Employee ID, Status)
+
+Password Policy:
+• Minimum 6 characters
+• At least 1 letter, 1 number, 1 special character (!@#$%^&*)
+• Enforced on both client-side (JS) and server-side (PHP)
+
+4.3 User Management Pages
+
+list_users.php (Admin Only)
+
+Features:
+• Paginated list (default: 100 per page)
+• Search functionality
+• Filters: Role, Status
+• Display columns: Profile Photo, Name, Employee ID, Username, 
+  Email, Phone, Role, Status, Created At, Actions
+• Actions: Edit, Delete, Reset Password (via Bootstrap modals)
+
+view_user.php (Admin Only)
+
+Purpose: View complete user profile
+
+Display:
+• All user fields (read-only)
+• Profile photo
+• Contact information
+• Role and status
+• Timestamps
+
+Revision History Section (Admin Only):
+• Shows last 15 revisions for the user
+• Columns: Timestamp, User Responsible, What Changed
+• Use Bootstrap collapse/accordion for clean layout
+• Example: "Updated First Name from 'John' to 'Jonathan'", 
+  "Role changed to Admin"
+
+add_user.php (Admin Only)
+
+Features:
+• Bootstrap modal form (optional)
+• All field validations (required fields, unique constraints)
+• Password policy enforcement
+• Password hashing before storage
+• Success/error alerts
+• Profile photo upload with resize option
+
+Validation:
+• Employee ID: unique, required
+• Username: unique if provided
+• Email: valid format, unique if provided
+• Password: meets policy requirements
+
+edit_user.php
+
+Access Control:
+• Admin: can edit all fields
+• Standard User: can edit all EXCEPT Role, Employee ID, Status
+
+Features:
+• Pre-filled form with existing data
+• Same validations as add_user
+• Profile photo update/remove/keep blank options
+• Password change with policy validation
+• Success/error feedback
+
+Note: ID field is never displayed
+
+delete_user.php (Admin Only)
+
+Features:
+• Confirmation modal before deletion
+• Permanent record deletion
+• Cannot delete own account (optional safeguard)
+
+reset_password.php (Admin Only)
+
+Purpose: Admin sets new password for user
+
+Workflow:
+1. Admin enters new password for user
+2. Password meets policy requirements
+3. Password is hashed and saved
+4. System forces user to change password on next login
+5. Optional: Email notification to user
+
+profile.php (All Users)
+
+Features:
+• View own information
+• Editable fields: Profile Photo, First Name, Last Name, Username, 
+  Email, Phone Numbers, Password
+• Profile photo upload (max 5MB, JPEG/JPG/PNG) with image resizer
+• Change password with policy validation
+• Bootstrap form layout
+• Success/error alerts
+
+═══════════════════════════════════════════════════════════════════
+
+5. MODULE 2: TASK MANAGEMENT
+
+5.1 Overview
+
+A multi-user task management system where employees can create, assign, and track to-do tasks with deadlines, status tracking, and automatic notifications.
+
+5.2 Task Board Structure
+
+Task Tabs with Counts:
+
+┌─────────────┬────────────────────────────┬────────────────────┐
+│ Tab         │ Description                │ Status Filter      │
+├─────────────┼────────────────────────────┼────────────────────┤
+│ To Do (10)  │ Active tasks not started   │ All except         │
+│             │                            │ Completed/Cancelled│
+│ Doing (5)   │ Tasks in progress          │ Status: Started    │
+│ Past Due(3) │ Tasks past deadline        │ Auto-updated       │
+│ Done (20)   │ Completed tasks            │ Status: Completed  │
+│ Dropped (2) │ Cancelled tasks            │ Status: Cancelled  │
+└─────────────┴────────────────────────────┴────────────────────┘
+
+
+Rules:
+• Task must be "Doing" before it can be marked "Done"
+• Past Due status automatically set by system when deadline passes
+• Any user (creator, assignee, or admin) can mark task as Dropped
+• Done and Dropped tasks would not show in TO DO tab
+
+
+5.5 Core Features
+
+Task Operations:
+• Create new task
+• Assign to one or multiple employees
+• Edit task details (creator, assignee, or admin)
+• Update status (AJAX-based, no page reload)
+• Extend deadline (admin only)
+• Add comments/activity log (optional)
+
+Search & Filter:
+• Filter by: Date, Priority, Status, Assignee
+• Sort by: Due date, Creation date
+• Search by: Title, Tags, Description
+
+Task Display:
+• List view with all relevant information
+• Color coding by priority
+• Status badges
+• Assigned user avatars
+
+5.6 Dashboard & Reports
+
+Admin Dashboard:
+• Total tasks created
+• Pending tasks count
+• Completed tasks count
+• Performance metrics (completion rate by person)
+• Overdue tasks summary
+
+Employee Dashboard:
+• Personal task summary
+• My assigned tasks
+• Tasks I created
+• Daily/weekly productivity stats
+• Completion percentage
+
+5.7 Notification System
+
+Automatic Notifications:
+
+1. Task Assigned: All assigned employees receive notification
+2. Deadline Passed: Assigned employees + creator receive 
+   "Past Due" alert
+3. Status Changed: All involved users (creator + assigned) notified
+4. Task Completed: Creator and all assignees notified
+5. Task Cancelled: All involved parties notified
+
+Implementation:
+• AJAX polling for real-time updates
+• Optional: PHP cron job to check overdue tasks periodically
+
+═══════════════════════════════════════════════════════════════════
+
+6. MODULE 3: EQUIPMENT MANAGEMENT
+
+6.1 Overview
+
+Comprehensive equipment inventory system supporting multiple equipment 
+types with dynamic fields, warranty tracking, and network integration.
+
+6.2 Common Equipment Fields
+
+Identification Block:
+• Label/Name (required)
+• Type (required, dropdown from equipment_types table)
+• Brand/Manufacturer (optional)
+• Model Number (optional)
+• Serial Number (not required, unique)
+
+Network Connection Option:
+After identification block, show toggle: "Does this device have a 
+network connection?"
+• If YES: Display network information fields
+
+Location Block:
+• Location (optional, free text)
+• Floor No (optional)
+• Department (optional)
+• Assigned To - Name (optional)
+• Assigned To - Designation (optional)
+
+Status & Condition:
+• Status (required): In Use, Available, Under Repair, Retired
+• Condition (not required): New, Good, Needs Service, Damaged
+• Remarks/Notes (optional, textarea)
+
+Warranty Block:
+• Seller Company (optional)
+• Purchase Date (optional, date picker)
+• Warranty Expiry Date (optional, date picker)
+• Warranty Documents (optional, multiple files):
+  - Formats: PDF, JPG, PNG, JPEG
+  - Max size: 15MB per file
+  - Storage: /uploads/warranty/
+
+Warranty Notifications (Auto-generated):
+• 30 days before expiry
+• 15 days before expiry
+• On expiry date
+
+Custom Fields (Optional):
+• Custom Label 1 + Custom Value 1
+• Custom Label 2 + Custom Value 2
+
+Metadata:
+• created_by (employee_id)
+• created_at (GMT+6)
+• updated_at (GMT+6)
+
+6.3 Equipment Types
+
+Supported Types:
+1. Desktop PC
+2. Laptop
+3. Monitor
+4. UPS
+5. Web Camera
+6. SSD
+7. HDD
+8. RAM
+9. Printer
+10. Scanner
+11. Network Switch
+12. WiFi Router
+13. Server
+14. KVM
+15. Projector
+16. Speaker/Headphones
+17. CCTV Camera
+18. NVR/DVR
+19. Graphics Card
+20. Custom Type (user-defined with custom fields)
+
+6.4 Type-Specific Fields
+
+Desktop PC:
+• Motherboard
+• CPU
+• RAM (multiple entries or linkable to existing RAM entries)
+• SSD (multiple or linkable to existing SSD entries)
+• HDD (multiple or linkable to existing HDD entries)
+• Graphics Card (model + size + Serial number / linkable to existing Graphics Card entries)
+• OS
+• Monitor (manual entry OR link to existing Monitor entry)
+
+Linking Feature: When adding SSD/HDD/Monitor, user can either:
+1. Enter details manually, OR
+2. Select existing equipment by serial number (shows as clickable link in view page)
+
+Laptop:
+• Motherboard, CPU, RAM (multiple), SSD (multiple), HDD (multiple)
+• Graphics Card (model + size + serial number / linkable to existing Graphics Card entries), OS
+
+Monitor:
+• Display Size, Color
+• Ports: VGA, HDMI, DisplayPort, DVI, USB-C, Thunderbolt (multi select)
+
+UPS:
+• Battery Capacity
+
+SSD/HDD:
+• Storage Capacity
+
+Printer:
+• Output Color (Color / B&W)
+
+Network Switch:
+• Type, Ports, Data Transmission Rate
+
+Graphics Card:
+• model + size
+
+6.5 Equipment Pages
+
+list_equipment.php (All User)
+
+Features:
+• Bootstrap responsive table (table-sm)
+• Global search with keyword highlighting
+• Multiselect filters: Type, Brand, Location, Floor No, Department, Condition
+• Pagination (100 per page)
+• Export options: Export All, Export by Equipment Type, Export Selected
+
+Dynamic Columns by Type:
+Base columns for all: #, Type, Brand, Serial Number, Location, Floor No, Department, Condition, Warranty (YES/NO), Updated At (admin), Created By (admin), Action
+
+Actions:
+• View (opens in new tab)
+• Edit (opens in new tab)
+• Delete (with confirmation modal)
+
+Admin-Only Columns:
+• created_by (shows Employee ID)
+• updated_at
+
+add_equipment.php (All User)
+
+Workflow:
+1. User selects equipment type
+2. Form dynamically loads type-specific fields via AJAX
+3. User fills required and optional fields
+4. Network connection toggle (if applicable)
+5. Warranty information (optional)
+6. Custom fields (optional)
+7. Submit with validation
+
+Validation:
+• Serial number: unique (except "N/A" or NULL which can be duplicate)
+• IP address: valid IPv4 format (if network enabled)
+• Required fields: Label, Type
+• File upload: size and format checks
+
+Form Behavior:
+• Preserve input values on validation error
+• Real-time validation as user types
+• Highlight invalid fields
+• Show clear error messages
+
+Success Actions:
+• Insert equipment record
+• Insert network info (if applicable)
+• Upload warranty documents
+• Create notification
+• Redirect with success message
+
+view_equipment.php (All User)
+
+Display:
+• All common fields
+• Type-specific fields
+• Network information (if assigned)
+• Warranty details and download links
+• Status showing if warranty active/expired
+
+Action Buttons:
+• Edit
+• Delete (with confirmation modal)
+
+Admin-Only Section:
+Revision History (bottom of page)
+• Shows last 100 revisions
+• Columns: Timestamp, Changed By, What Changed
+
+edit_equipment.php (All User)
+
+Features:
+• Pre-filled form with existing data
+• Same validation as add_equipment
+• Can update warranty documents (replace or add more)
+• Can edit or unassign network info
+• Dynamic field loading based on type
+
+delete_equipment.php (All User)
+
+Confirmation Modal Requirements:
+• User must type "DELETE" to confirm
+• Options for network info:
+  - Delete associated network info
+  - Keep network info but unassign
+
+Actions:
+• Delete equipment record
+• Handle warranty file deletion from server
+• Update/delete network associations
+• Log notification
+
+═══════════════════════════════════════════════════════════════════
+
+7. MODULE 4: NETWORK MANAGEMENT
+
+7.1 Overview
+
+Manages network configuration for all network-enabled equipment, 
+including IP addresses, MAC addresses, patch panel information, 
+and switch assignments.
+
+7.3 Network Pages
+
+list_network_info.php
+
+Display Columns (in order):
+1. #
+2. IP Address
+3. MAC Address
+4. Cable No
+5. Patch Panel No
+6. Patch Panel Port
+7. Patch Panel Location
+8. Switch No
+9. Switch Port
+10. Switch Location
+11. Attached Equipment (linked, opens in new tab)
+12. Remarks
+13. Created (employee_id)
+14. Updated
+15. Action
+
+Features:
+• Global search (ignores whitespace)
+• Sortable columns
+• Search highlighting (matched text only)
+• table-sm and container-fluid layout, table will be responsive
+• Pagination (100 per page)
+• Export: All, by Equipment Type, Selected
+
+Actions:
+• View (new tab)
+• Edit (new tab)
+• Delete (only if equipment_id IS NULL)
+
+add_network_info.php
+
+Fields:
+• IP Address (required, unique, IPv4 validation)
+• MAC Address (optional, unique except "N/A")
+• Cable Number, Patch Panel Info, Switch Info
+• Attached Equipment (optional dropdown)
+• Remarks
+
+Equipment Assignment:
+• Dropdown shows only unassigned equipment
+• User can optionally link network info to equipment
+
+Validation:
+• IP format: regex validation (real-time)
+• IP uniqueness check
+• MAC address: allow duplicate "N/A"
+
+Success Actions:
+• Insert network record
+• Update equipment if linked
+• Create notification
+• Redirect to list with success alert
+
+edit_network_info.php (All User)
+
+Features:
+• Load existing network data
+• Allow editing all fields
+• Validate IP format and uniqueness
+• Can change equipment assignment
+• Can unassign equipment
+
+view_network_info.php (All User)
+
+Display:
+• All network fields (read-only)
+• Linked equipment info
+• Timestamps
+• Bootstrap card layout
+
+Action Buttons:
+• Edit, Delete (only if unassigned), Back to List
+
+Admin-Only Section:
+• Revision History (last 100 revisions)
+
+delete_network_info.php (All User)
+
+Rules:
+• Can ONLY delete if equipment_id IS NULL
+• If assigned, return error 422
+
+Confirmation:
+• Modal with typed confirmation ("delete")
+
+assign_network_info.php (All User)
+
+Purpose: Link network info to equipment
+
+Display:
+• Dropdown of available equipment
+• Dropdown of unassigned network entries
+
+Validation:
+• Ensure selected IP not already assigned
+• Ensure equipment has no conflicting network record
+
+unassign_network_info.php (All User)
+
+Purpose: Detach network from equipment
+
+Actions:
+• Set equipment_id to NULL
+• Retain all other data
+• Create notification
+
+7.4 Network Notifications
+
+All network operations trigger system-wide notifications:
+• Add, Update, Assign, Unassign, Delete
+
+7.5 Network UI Requirements
+
+Standards:
+• Bootstrap 5 components
+• container-fluid layout
+• table-sm for tables
+• Card layouts for forms
+• Modals for confirmations
+
+Validation:
+• Client-side: regex for IP, optional for MAC
+• Server-side: all validations enforced
+
+AJAX Usage:
+• Dynamic dropdowns
+• Assign/unassign operations without reload
+• Real-time validation feedback
+
+═══════════════════════════════════════════════════════════════════
+
+8. MODULE 5: NOTIFICATIONS
+
+8.1 Overview
+
+Real-time notification system that tracks all system events and 
+provides per-user read/acknowledge status.
+
+8.2 Notification Triggers
+
+Equipment Events:
+• Equipment added, updated, deleted
+
+Network Events:
+• Network info added, updated, assigned, unassigned, deleted
+
+User Events (Admin Only):
+• User added, role changed, deleted
+
+Task Events:
+• Task assigned, status changed, deadline approaching, overdue
+
+Warranty Events:
+• 30 days to expiry, 15 days to expiry, Expired
+
+
+8.4 Notification Behavior
+
+Who Receives Notifications:
+• All signed-in users receive equipment/network notifications
+• Admin-only: user management notifications
+• Task notifications: creator + assigned users
+• Warranty notifications: admin + equipment responsible person
+
+Read/Acknowledge Logic:
+• Each user has their own status row per notification
+• is_read: Controls bold/normal styling
+• is_acknowledged: Hides "Acknowledge" button
+
+User Actions:
+• Click notification: Opens related page, sets is_read = 1
+• Click Acknowledge: Sets is_acknowledged = 1 via AJAX
+
+8.5 Header Bell Icon
+
+Badge Display:
+• Shows count of unacknowledged notifications
+• Updates via AJAX polling (default: every 30s)
+
+Bell Click Behavior:
+• Opens Bootstrap dropdown panel
+• Shows last 15 notifications
+• Display: Type icon, Title, Message, Relative time, 
+  Acknowledge button
+• "View All" link to full notifications page
+
+8.6 Full Notifications Page
+
+Display:
+• Paginated table/list (default: 100 per page)
+
+Columns:
+• Type, Title, Message, Created, From, Read?, Acknowledged?, Action
+
+Filters:
+• Type, Event, Read Status, Acknowledged Status, Date Range, 
+  Free-text search
+
+Actions per Row:
+• Open, Mark as Read/Unread, Acknowledge, Delete (admin only)
+
+Bulk Actions (Admin):
+• Delete old notifications
+• Mark all as read
+
+8.7 Performance & Refresh
+
+AJAX Polling:
+• Default interval: 30 seconds
+• Configurable in system settings
+• Updates bell count and panel content
+
+8.8 Timestamp Display
+
+Format:
+• Store: YYYY-MM-DD HH:mm:ss (GMT+6)
+• Display: Relative time with tooltip
+
+Timezone:
+• All timestamps in GMT+6 (Asia/Dhaka)
+
+8.9 Permissions
+
+All Authenticated Users:
+• View their notifications
+• Manage their own read/acknowledge status
+
+Admin:
+• View all notifications
+• Bulk delete old notifications
+• Manage notification settings
+
+═══════════════════════════════════════════════════════════════════
+
+9. MODULE 6: TOOLS & SETTINGS
+
+9.1 Overview
+
+Administrative tools for database maintenance, system monitoring, 
+and configuration management. All tools are Admin-only.
+
+Location: pages/tools/
+
+9.2 Database Optimization Tool
+
+File: optimize_database.php (Admin)
+
+Purpose: Optimize database tables for better performance, ensuring that no optimization actions are performed that could potentially slow down, interrupt, or break the database.
+
+Features:
+• Runs MySQL OPTIMIZE TABLE on all system tables
+• Displays optimization results
+• Shows last optimization timestamp
+• Stores timestamp in system_settings table
+
+UI:
+• Bootstrap card layout
+• "Run Optimization" button
+• Spinner/progress indicator
+• Success/error alerts
+• Result summary table
+
+Key Tables to Optimize:
+users, equipments, equipment_custom_values, network_info, 
+notifications, user_notification_status, tasks, system_logs
+
+9.3 Database Backup Tool
+
+File: backup_database.php (Admin)
+
+Purpose: Generate SQL backup files
+
+Features:
+• Exports entire database to .sql file
+• Automatic filename: backup_DBName_YYYYMMDD_HHMMSS.sql
+• Stores in /backups/ directory
+• Backup management table
+
+Backup List Display:
+Columns: #, Filename, Size, Created, Action (Download/Delete)
+
+Actions:
+• Download: Direct file download
+• Delete: Confirmation modal, then remove file
+
+UI:
+• Bootstrap table
+• Alert messages
+• Confirmation modal for delete
+• Timestamps in GMT+6
+
+9.4 System Logs Viewer
+
+File: system_logs.php (Admin)
+
+Purpose: Monitor system activity for debugging and audits
+
+Log Sources:
+• PHP error logs
+• Login attempts (successful and failed)
+• Equipment operations
+• Network changes
+• Notification creation
+• Admin tools usage
+• User management actions
+
+Features:
+• Search functionality
+• Date range filter
+• Color-coded entries: Info (green), Warning (yellow), Error (red)
+• Pagination (50 per page)
+• "Clear Log" button (admin only)
+
+Display Format:
+[2025-01-15 14:30:22] [INFO] User 'Rakib' logged in successfully
+[2025-01-15 14:35:10] [WARNING] Failed login attempt for ID: E-101
+[2025-01-15 14:40:05] [ERROR] Database connection failed
+
+9.5 System Settings Management
+
+File: system_settings.php (Admin)
+
+Purpose: Manage global system configurations
+
+Settings Table:
+┌──────────────────────────┬─────────────────────┬─────────────────┐
+│ Setting Key              │ Description         │ Default Value   │
+├──────────────────────────┼─────────────────────┼─────────────────┤
+│ system_name              │ Header/title        │ IT Equipment    │
+│                          │                     │ Manager         │
+│ timezone                 │ System timezone     │ Asia/Dhaka      │
+│ records_per_page         │ Default pagination  │ 100             │
+│ notification_refresh     │ Bell refresh (sec)  │ 30              │
+│ last_optimization_time   │ Auto-filled         │ NULL            │
+└──────────────────────────┴─────────────────────┴─────────────────┘
+
+UI:
+• Bootstrap form with inline editable key-value pairs
+• Save Changes button
+• Confirmation alert on success
+
+9.6 Cache Cleanup Tool
+
+File: cache_cleanup.php (All User)
+
+Purpose: Clear temporary data and cache to improve performance
+
+Cache Types:
+• System Cache: /cache/ directory
+• Temporary Uploads: /temp/ or /uploads/temp/
+• PHP Session Cache (optional)
+
+Features:
+• Selective cleanup options:
+  - "Clean System Cache" button
+  - "Clean User Sessions" button
+  - "Clean All Cache" button
+• Progress indicator
+• Result summary: Files deleted count, Space freed
+
+9.7 Database Repair Tool
+
+File: repair_database.php (Admin)
+
+Purpose: Check and repair MySQL table corruption
+
+Features:
+• Runs CHECK TABLE on all system tables
+• Runs REPAIR TABLE on tables with issues
+• Displays real-time progress
+
+Repair Process:
+1. Check each table for corruption
+2. Display check results
+3. Repair tables with errors
+4. Show repair status
+
+Result Display:
+Table Name | Check Status | Repair Status | Message
+
+═══════════════════════════════════════════════════════════════════
