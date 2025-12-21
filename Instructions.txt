@@ -1,0 +1,25 @@
+1st:
+Phases : List all development phases briefly (no detailed explanations required).
+
+Folder Structure : Create a complete folder tree and file system layout for the project.
+
+Coding:  Begin coding immediately after defining the structure. At the top of every file, include Folder path, File name A short comment describing the file’s purpose
+
+After Completion : Once each phase or file is complete, do not add lengthy descriptions or detailed system explanations. Simply provide a list of completed files.
+
+Must show all page's code, do not hide any page
+
+
+
+
+2nd:
+
+Folder Structure : Create a complete folder tree and file system layout for the project.
+
+Coding:  Begin coding immediately after defining the structure. At the top of every file, include Folder path, File name A short comment describing the file’s purpose
+
+After Completion : Once each phase or file is complete, do not add lengthy descriptions or detailed system explanations. Simply provide a list of completed files.
+
+Must show all page's code, do not hide any page
+
+Some phases have been completed here. Please check the codes and let me know if any corrections are needed.
